@@ -9,10 +9,10 @@
     const startBtn = document.getElementById('start-btn');
     const roundDisplay = document.getElementById('round-display');
     const messageArea = document.getElementById('message-area');
-    const hiddenNumber = document.getElementById('hidden-number'); // Reference to the number element
+    const clueModal = document.getElementById('clue-modal');
+    const closeClueBtn = document.getElementById('close-clue-btn');
 
     // --- Game State Variables ---
-    // The color names are updated to match the new theme IDs
     const colors = ['marigold', 'skull', 'candle', 'cross'];
     let sequence = [];
     let playerSequence = [];
@@ -20,11 +20,11 @@
     let isPlayerTurn = false;
     let canClick = false;
     const maxRounds = 10;
+    let isClueUnlocked = false; // Prevents the clue from reappearing
 
     // --- Audio Setup (Web Audio API) ---
     const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-    const oscillators = {};
-
+    
     const createOscillator = (frequency) => {
         const oscillator = audioContext.createOscillator();
         oscillator.type = 'sine';
@@ -32,13 +32,11 @@
         return oscillator;
     };
 
-    // Pre-create oscillators and gain nodes for each button
     const colorSounds = {
-        // Frequencies are kept the same for game consistency
-        'marigold': { freq: 329.63, osc: createOscillator(329.63) }, // E4
-        'skull': { freq: 440.00, osc: createOscillator(440.00) }, // A4
-        'candle': { freq: 392.00, osc: createOscillator(392.00) }, // G4
-        'cross': { freq: 261.63, osc: createOscillator(261.63) }, // C4
+        'marigold': { freq: 329.63, osc: createOscillator(329.63) }, 
+        'skull': { freq: 440.00, osc: createOscillator(440.00) }, 
+        'candle': { freq: 392.00, osc: createOscillator(392.00) }, 
+        'cross': { freq: 261.63, osc: createOscillator(261.63) }, 
     };
 
     const playSound = (color, duration = 200) => {
@@ -93,7 +91,7 @@
         gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.5);
 
         const osc = audioContext.createOscillator();
-        osc.frequency.value = 100; // Low frequency for a "buzz" sound
+        osc.frequency.value = 100; 
         osc.connect(gain);
         osc.start(now);
         osc.stop(now + 0.5);
@@ -112,6 +110,7 @@
         startBtn.style.display = 'none';
         messageArea.textContent = '';
         roundDisplay.textContent = `Round ${round}`;
+        clueModal.classList.add('hidden'); // Ensure modal is hidden
 
         // Wait a moment before starting the first round
         setTimeout(nextRound, 1000);
@@ -162,7 +161,7 @@
 
     const handleButtonClick = (event) => {
         if (!isPlayerTurn || !canClick) {
-            return; // Ignore clicks if it's not the player's turn or if a sequence is playing
+            return; 
         }
 
         const clickedColor = event.target.closest('.calavera-button').id;
@@ -206,13 +205,28 @@
 
     const celebration = () => {
         playWinSound();
-        messageArea.textContent = 'You did it! Your memory is as sharp as a tack, just like Grandma\'s.';
-        startBtn.style.display = 'block';
+        isClueUnlocked = true;
+        
+        // Hide game controls
+        roundDisplay.textContent = 'CLUE UNLOCKED!';
+        messageArea.textContent = '';
+        startBtn.style.display = 'none';
+
+        // Display the clue image modal
+        clueModal.classList.remove('hidden');
     };
 
     // --- Event Listeners ---
     startBtn.addEventListener('click', startGame);
     document.querySelectorAll('.calavera-button').forEach(button => {
         button.addEventListener('click', handleButtonClick);
+    });
+    
+    // Set up a listener for the close button right away
+    closeClueBtn.addEventListener('click', () => {
+        clueModal.classList.add('hidden');
+        // Show the final text message and the start button after closing
+        messageArea.textContent = 'You did it! Your memory is as sharp as a tack, just like Grandma\'s.';
+        startBtn.style.display = 'block';
     });
 })();
