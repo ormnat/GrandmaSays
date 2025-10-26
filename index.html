@@ -30,6 +30,15 @@
             </div>
         </div>
     </div>
+    
+    <!-- New modal container for the clue image, initially hidden -->
+    <div id="clue-modal" class="clue-image-container hidden">
+        <h2 class="text-3xl font-bold text-gray-800 mb-4">Clue Unlocked!</h2>
+        <!-- Using the file path provided previously -->
+        <img id="clue-image" src="uploaded:The Chef.jpg-4cd902e0-0cb9-4239-8896-73b3390f1663" alt="The Master Chef" class="clue-image">
+        <button id="close-clue-btn" class="mt-4 px-6 py-2 bg-red-600 text-white font-bold rounded-full shadow-lg hover:bg-red-700 transition">Close</button>
+    </div>
+    
     <!-- Link to the external JavaScript file -->
     <script src="script.js"></script>
 </body>
